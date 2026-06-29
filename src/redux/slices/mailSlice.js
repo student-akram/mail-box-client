@@ -38,15 +38,15 @@ const mailSlice = createSlice({
       }
     },
 
-    deleteMail(state, action) {
-      state.inbox = state.inbox.filter(
-        (mail) => mail.id !== action.payload
-      );
+deleteMail(state, action) {
+  state.inbox = state.inbox.filter(
+    (mail) => mail.id !== action.payload
+  );
 
-      state.unreadCount = state.inbox.filter(
-        (mail) => !mail.read
-      ).length;
-    },
+  state.unreadCount = state.inbox.filter(
+    (mail) => !mail.read
+  ).length;
+},
 
     setLoading(state, action) {
       state.loading = action.payload;

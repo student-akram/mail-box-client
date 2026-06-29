@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import {
-  Container,
-  Card,
-  Table,
-  Button,
-  Badge,
+    Container,
+    Card,
+    Table,
+    Button,
+    Badge,
 } from "react-bootstrap";
 
 import { useNavigate } from "react-router-dom";
@@ -13,155 +13,189 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { getInboxMails } from "../services/mailService";
 import { mailActions } from "../redux/slices/mailSlice";
+import { deleteMail } from "../services/mailService";
 
 function Inbox() {
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const email = useSelector(
-    (state) => state.auth.email
-  );
+    const email = useSelector(
+        (state) => state.auth.email
+    );
 
-  const inbox = useSelector(
-    (state) => state.mail.inbox
-  );
+    const inbox = useSelector(
+        (state) => state.mail.inbox
+    );
 
-  const unreadCount = useSelector(
-    (state) => state.mail.unreadCount
-  );
+    const unreadCount = useSelector(
+        (state) => state.mail.unreadCount
+    );
 
-  useEffect(() => {
-    fetchInbox();
-  }, []);
+    useEffect(() => {
+        fetchInbox();
+    }, []);
 
-  const fetchInbox = async () => {
-    try {
-      const mails = await getInboxMails(email);
+    const fetchInbox = async () => {
+        try {
+            const mails = await getInboxMails(email);
 
-      dispatch(mailActions.setInbox(mails));
+            dispatch(mailActions.setInbox(mails));
 
-    } catch (err) {
-      console.log(err);
-    }
-  };
+        } catch (err) {
+            console.log(err);
+        }
+    };
+    const deleteHandler = async (mailId) => {
+        try {
+            await deleteMail(email, mailId);
 
-  return (
-    <Container className="mt-5">
+            dispatch(mailActions.deleteMail(mailId));
 
-      <div className="d-flex justify-content-between align-items-center mb-4">
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
-        <h2>
-          Inbox{" "}
-          <Badge bg="primary">
-            {unreadCount}
-          </Badge>
-        </h2>
+    return (
+        <Container className="mt-5">
 
-        <Button
-          onClick={() => navigate("/compose")}
-        >
-          Compose
-        </Button>
+            <div className="d-flex justify-content-between align-items-center mb-4">
 
-      </div>
+                <h2>
+                    Inbox{" "}
+                    <Badge bg="primary">
+                        {unreadCount}
+                    </Badge>
+                </h2>
 
-      <Card className="shadow">
-
-        <Table hover>
-
-          <thead>
-
-            <tr>
-
-              <th>Status</th>
-
-              <th>From</th>
-
-              <th>Subject</th>
-
-              <th>Date</th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {inbox.length === 0 ? (
-
-              <tr>
-
-                <td
-                  colSpan="4"
-                  className="text-center"
+                <Button
+                    onClick={() => navigate("/compose")}
                 >
-                  No Mails
-                </td>
+                    Compose
+                </Button>
 
-              </tr>
+            </div>
 
-            ) : (
+            <Card className="shadow">
 
-              inbox.map((mail) => (
+                <Table hover>
 
-                <tr
-                  key={mail.id}
-                  style={{
-                    cursor: "pointer",
-                  }}
-                  onClick={() =>
-                    navigate(
-                      `/mail/${mail.id}`
-                    )
-                  }
-                >
+                    <thead>
 
-                  <td>
+                        <tr>
 
-                    {!mail.read ? (
-                      <span
-                        style={{
-                          color: "blue",
-                          fontSize: "22px",
-                        }}
-                      >
-                        ●
-                      </span>
-                    ) : (
-                      ""
-                    )}
+                            <th>Status</th>
 
-                  </td>
+                            <th>From</th>
 
-                  <td>
-                    {mail.from}
-                  </td>
+                            <th>Subject</th>
 
-                  <td>
-                    {mail.subject}
-                  </td>
+                            <th>Date</th>
 
-                  <td>
-                    {new Date(
-                      mail.date
-                    ).toLocaleString()}
-                  </td>
+                            <th>Action</th>
 
-                </tr>
+                        </tr>
 
-              ))
+                    </thead>
 
-            )}
+                    <tbody>
 
-          </tbody>
+                        {inbox.length === 0 ? (
 
-        </Table>
+                            <tr>
 
-      </Card>
+                                <td
+                                    colSpan="4"
+                                    className="text-center"
+                                >
+                                    No Mails
+                                </td>
 
-    </Container>
-  );
+                            </tr>
+
+                        ) : (
+
+                            inbox.map((mail) => (
+
+                                <tr
+                                    key={mail.id}
+                                    style={{
+                                        cursor: "pointer",
+                                    }}
+
+                                >
+
+                                    <td>
+
+                                        {!mail.read ? (
+                                            <span
+                                                style={{
+                                                    color: "blue",
+                                                    fontSize: "22px",
+                                                }}
+                                            >
+                                                ●
+                                            </span>
+                                        ) : (
+                                            ""
+                                        )}
+
+                                    </td>
+
+                                    <td>
+                                        {mail.from}
+                                    </td>
+
+                                    <td
+                                        onClick={() =>
+                                            navigate(`/mail/${mail.id}`)
+                                        }
+                                    >
+
+                                        {mail.subject}
+
+                                    </td>
+
+                                    <td>
+                                        {new Date(
+                                            mail.date
+                                        ).toLocaleString()}
+                                    </td>
+                                    <td>
+
+                                        <Button
+                                            variant="danger"
+                                            size="sm"
+
+                                            onClick={() =>
+
+                                                deleteHandler(mail.id)
+
+                                            }
+
+                                        >
+
+                                            Delete
+
+                                        </Button>
+
+                                    </td>
+
+                                </tr>
+
+                            ))
+
+                        )}
+
+                    </tbody>
+
+                </Table>
+
+            </Card>
+
+        </Container>
+    );
 }
 
 export default Inbox;

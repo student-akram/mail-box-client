@@ -59,3 +59,10 @@ export const markMailAsRead = async (email, mailId) => {
     }
   );
 };
+export const deleteMail = async (email, mailId) => {
+  const userKey = email.replace(/\./g, ",");
+
+  await axios.delete(
+    `${DATABASE_URL}/mailbox/inbox/${userKey}/${mailId}.json`
+  );
+};
