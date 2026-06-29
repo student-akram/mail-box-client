@@ -1,13 +1,26 @@
-import { Container } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 function Welcome() {
-  return (
-    <Container className="text-center mt-5">
-      <h1>
-        Welcome to your Mail Box
-      </h1>
-    </Container>
-  );
+
+    const navigate = useNavigate();
+
+    return (
+
+        <Container className="text-center mt-5">
+
+            <h2>Welcome to your Mail Box</h2>
+
+            <Button
+                className="mt-4"
+                onClick={() => navigate("/compose")}
+            >
+                Compose Mail
+            </Button>
+
+        </Container>
+
+    );
 }
 
 export default Welcome;
