@@ -1,44 +1,45 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Container, Card, Table, Button } from "react-bootstrap";
+import { useEffect } from "react";
+import {
+  Container,
+  Card,
+  Table,
+  Button,
+  Badge,
+} from "react-bootstrap";
+
 import { useNavigate } from "react-router-dom";
 
+import { useDispatch, useSelector } from "react-redux";
+
+import { getInboxMails } from "../services/mailService";
+import { mailActions } from "../redux/slices/mailSlice";
+
 function Inbox() {
-  const [mails, setMails] = useState([]);
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
+  const email = useSelector(
+    (state) => state.auth.email
+  );
+
+  const inbox = useSelector(
+    (state) => state.mail.inbox
+  );
+
+  const unreadCount = useSelector(
+    (state) => state.mail.unreadCount
+  );
+
   useEffect(() => {
-    fetchMails();
+    fetchInbox();
   }, []);
 
-  const fetchMails = async () => {
+  const fetchInbox = async () => {
     try {
-      const email = localStorage.getItem("email");
+      const mails = await getInboxMails(email);
 
-      const userKey = email.replace(/\./g, ",");
-
-      const response = await axios.get(
-        `${import.meta.env.VITE_FIREBASE_DATABASE_URL}/mailbox/inbox/${userKey}.json`
-      );
-
-      const data = response.data;
-
-      if (!data) {
-        setMails([]);
-        return;
-      }
-
-      const loadedMails = [];
-
-      for (const key in data) {
-        loadedMails.push({
-          id: key,
-          ...data[key],
-        });
-      }
-
-      setMails(loadedMails);
+      dispatch(mailActions.setInbox(mails));
 
     } catch (err) {
       console.log(err);
@@ -48,9 +49,14 @@ function Inbox() {
   return (
     <Container className="mt-5">
 
-      <div className="d-flex justify-content-between mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
 
-        <h2>Inbox</h2>
+        <h2>
+          Inbox{" "}
+          <Badge bg="primary">
+            {unreadCount}
+          </Badge>
+        </h2>
 
         <Button
           onClick={() => navigate("/compose")}
@@ -62,11 +68,13 @@ function Inbox() {
 
       <Card className="shadow">
 
-        <Table striped hover>
+        <Table hover>
 
           <thead>
 
             <tr>
+
+              <th>Status</th>
 
               <th>From</th>
 
@@ -80,28 +88,64 @@ function Inbox() {
 
           <tbody>
 
-            {mails.length === 0 ? (
+            {inbox.length === 0 ? (
 
               <tr>
 
-                <td colSpan="3" className="text-center">
-                  No Mails Found
+                <td
+                  colSpan="4"
+                  className="text-center"
+                >
+                  No Mails
                 </td>
 
               </tr>
 
             ) : (
 
-              mails.map((mail) => (
+              inbox.map((mail) => (
 
-                <tr key={mail.id}>
-
-                  <td>{mail.from}</td>
-
-                  <td>{mail.subject}</td>
+                <tr
+                  key={mail.id}
+                  style={{
+                    cursor: "pointer",
+                  }}
+                  onClick={() =>
+                    navigate(
+                      `/mail/${mail.id}`
+                    )
+                  }
+                >
 
                   <td>
-                    {new Date(mail.date).toLocaleString()}
+
+                    {!mail.read ? (
+                      <span
+                        style={{
+                          color: "blue",
+                          fontSize: "22px",
+                        }}
+                      >
+                        ●
+                      </span>
+                    ) : (
+                      ""
+                    )}
+
+                  </td>
+
+                  <td>
+                    {mail.from}
+                  </td>
+
+                  <td>
+                    {mail.subject}
+                  </td>
+
+                  <td>
+                    {new Date(
+                      mail.date
+                    ).toLocaleString()}
                   </td>
 
                 </tr>

@@ -8,7 +8,10 @@ import {
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useDispatch } from "react-redux";
+
 import { auth } from "../firebase/firebase";
+import { authActions } from "../redux/slices/authSlice";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -16,6 +19,7 @@ function Login() {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -28,31 +32,32 @@ function Login() {
     }
 
     try {
-      // Login user
       const response = await signInWithEmailAndPassword(
         auth,
         email,
         password
       );
 
-      // Get Firebase ID Token
       const token = await response.user.getIdToken();
-
-      // Get logged-in user's email
       const userEmail = response.user.email;
 
-      // Store in localStorage
+      // Save in Local Storage
       localStorage.setItem("token", token);
       localStorage.setItem("email", userEmail);
 
+      // Save in Redux
+      dispatch(
+        authActions.login({
+          token: token,
+          email: userEmail,
+        })
+      );
+
       console.log("Login Successful");
-      console.log("Token:", token);
-      console.log("Email:", userEmail);
 
       navigate("/inbox");
     } catch (err) {
       console.error(err);
-
       alert("Invalid Email or Password");
       setError("Invalid Email or Password");
     }
@@ -63,7 +68,11 @@ function Login() {
       <Card className="p-4 shadow" style={{ width: "420px" }}>
         <h2 className="text-center mb-4">Login</h2>
 
-        {error && <Alert variant="danger">{error}</Alert>}
+        {error && (
+          <Alert variant="danger">
+            {error}
+          </Alert>
+        )}
 
         <Form onSubmit={submitHandler}>
           <Form.Group className="mb-3">

@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Welcome from "./pages/Welcome";
 import ComposeMail from "./pages/ComposeMail";
 import Inbox from "./pages/Inbox";
+import ReadMail from "./pages/ReadMail";
 
 function App() {
   return (
@@ -21,6 +22,9 @@ function App() {
         <Route path="/compose" element={<ComposeMail />} />
 
         <Route path="/inbox" element={<Inbox />} />
+
+        <Route path="/mail/:id" element={<ReadMail />}
+/>
 
       </Routes>
 
