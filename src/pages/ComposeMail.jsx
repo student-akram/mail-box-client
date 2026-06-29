@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Container, Card, Form, Button, Alert } from "react-bootstrap";
+import axios from "axios";
 
 function ComposeMail() {
   const [to, setTo] = useState("");
@@ -9,32 +10,56 @@ function ComposeMail() {
   const [error, setError] = useState("");
 
   const sendMailHandler = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    setSuccess("");
-    setError("");
+  setSuccess("");
+  setError("");
 
-    if (!to || !subject || !message) {
-      setError("Please fill all the fields.");
-      return;
-    }
+  if (!to || !subject || !message) {
+    setError("Please fill all the fields.");
+    return;
+  }
 
-    // This is where we'll send data to Firebase in the next step.
-    const mailData = {
-      to,
-      subject,
-      message,
-    };
+  const senderEmail = localStorage.getItem("email");
 
-    console.log("Mail Data:", mailData);
+  const senderKey = senderEmail.replace(/\./g, ",");
+  const receiverKey = to.replace(/\./g, ",");
 
-    setSuccess("Mail is ready to send!");
+  const mailData = {
+    from: senderEmail,
+    to,
+    subject,
+    message,
+    date: new Date().toISOString(),
+  };
 
-    // Clear form
+  try {
+    // Receiver Inbox
+    await axios.post(
+      `${import.meta.env.VITE_FIREBASE_DATABASE_URL}/mailbox/inbox/${receiverKey}.json`,
+      mailData
+    );
+
+    // Sender Sent
+    await axios.post(
+      `${import.meta.env.VITE_FIREBASE_DATABASE_URL}/mailbox/sent/${senderKey}.json`,
+      mailData
+    );
+
+    console.log("Mail Sent Successfully");
+
+    setSuccess("Mail Sent Successfully");
+
     setTo("");
     setSubject("");
     setMessage("");
-  };
+
+  } catch (err) {
+    console.log(err);
+
+    setError("Failed to send mail.");
+  }
+};
 
   return (
     <Container className="mt-5">
