@@ -24,23 +24,34 @@ function Inbox() {
         (state) => state.auth.email
     );
 
-    const inbox = useSelector(
-        (state) => state.mail.inbox
-    );
+const inbox = useSelector(
+  (state) => state.mail.inbox
+);
 
     const unreadCount = useSelector(
         (state) => state.mail.unreadCount
     );
 
-    useEffect(() => {
-        fetchInbox();
-    }, []);
+useEffect(() => {
+  fetchInbox();
+
+  const interval = setInterval(() => {
+    fetchInbox();
+  }, 2000);
+
+  return () => clearInterval(interval);
+}, []);
 
     const fetchInbox = async () => {
         try {
             const mails = await getInboxMails(email);
 
-            dispatch(mailActions.setInbox(mails));
+if (
+  JSON.stringify(mails) !==
+  JSON.stringify(inbox)
+) {
+  dispatch(mailActions.setInbox(mails));
+}
 
         } catch (err) {
             console.log(err);
