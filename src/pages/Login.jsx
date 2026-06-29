@@ -49,7 +49,7 @@ function Login() {
       console.log("Token:", token);
       console.log("Email:", userEmail);
 
-      navigate("/welcome");
+      navigate("/inbox");
     } catch (err) {
       console.error(err);
 

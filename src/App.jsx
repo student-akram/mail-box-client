@@ -4,6 +4,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Welcome from "./pages/Welcome";
 import ComposeMail from "./pages/ComposeMail";
+import Inbox from "./pages/Inbox";
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
         <Route path="/welcome" element={<Welcome />} />
 
         <Route path="/compose" element={<ComposeMail />} />
+
+        <Route path="/inbox" element={<Inbox />} />
 
       </Routes>
 
