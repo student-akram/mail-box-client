@@ -39,11 +39,46 @@ export const getInboxMails = async (email) => {
 
   return mails.reverse();
 };
+export const getSentMails = async (email) => {
+  const userKey = email.replace(/\./g, ",");
+
+  const response = await axios.get(
+    `${DATABASE_URL}/mailbox/sent/${userKey}.json`
+  );
+
+  const data = response.data;
+
+  if (!data) return [];
+
+  const mails = [];
+
+  for (const key in data) {
+    mails.push({
+      id: key,
+      ...data[key],
+    });
+  }
+
+  return mails.reverse();
+};
 export const getSingleMail = async (email, mailId) => {
   const userKey = email.replace(/\./g, ",");
 
   const response = await axios.get(
     `${DATABASE_URL}/mailbox/inbox/${userKey}/${mailId}.json`
+  );
+
+  return response.data;
+};
+export const getSingleSentMail = async (
+  email,
+  mailId
+) => {
+
+  const userKey = email.replace(/\./g, ",");
+
+  const response = await axios.get(
+    `${DATABASE_URL}/mailbox/sent/${userKey}/${mailId}.json`
   );
 
   return response.data;

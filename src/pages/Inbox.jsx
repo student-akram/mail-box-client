@@ -68,12 +68,18 @@ function Inbox() {
                         {unreadCount}
                     </Badge>
                 </h2>
-
+                
                 <Button
-                    onClick={() => navigate("/compose")}
-                >
-                    Compose
-                </Button>
+    variant="secondary"
+    className="me-2"
+    onClick={() => navigate("/sent")}
+  >
+    Sent
+  </Button>
+
+  <Button onClick={() => navigate("/compose")}>
+    Compose
+  </Button>
 
             </div>
 

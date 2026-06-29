@@ -6,6 +6,8 @@ import Welcome from "./pages/Welcome";
 import ComposeMail from "./pages/ComposeMail";
 import Inbox from "./pages/Inbox";
 import ReadMail from "./pages/ReadMail";
+import SentMail from "./pages/SentMail";
+import ReadSentMail from "./pages/ReadSentMail";
 
 function App() {
   return (
@@ -23,8 +25,11 @@ function App() {
 
         <Route path="/inbox" element={<Inbox />} />
 
-        <Route path="/mail/:id" element={<ReadMail />}
-/>
+        <Route path="/mail/:id" element={<ReadMail />} />
+
+        <Route path="/sent" element={<SentMail />} />
+        
+        <Route path="/sent/:id" element={<ReadSentMail />} />
 
       </Routes>
 
